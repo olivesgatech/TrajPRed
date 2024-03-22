@@ -1,0 +1,83 @@
+project: ''
+visualize: false
+ckpt_dir: 'checkpoints/tprn_re_np' 
+out_dir: ''
+device: 'cuda'
+method: 'tprn_re_np'
+print_interval: 10
+model:
+  # img_size: (256,256)
+  best_of_many: True
+  discrepancy: True
+  k: 20
+  latent_dist: 'gaussian' 
+  latent_dim: 32 
+  dec_with_z: True
+  dec_backward_disable: True
+  input_len: 8
+  pred_len: 12 # input and pred_len is defined in 30fps
+  motion:
+    global_input_dim: 6
+    dec_output_dim: 2 
+  # dropout: 0.25
+  
+  # # with_flow: false
+  # enc_concat_type: 'average'
+    enc_input_size: 32 #128 #256
+  # flow_embed_size: 256
+  # flow_hidden_size: 256
+    enc_hidden_size: 128 #256
+    dec_input_size: 256
+    dec_hidden_size: 256
+  # region_rel_combine: 'attention'
+  # region_rel_disable: True
+  # region_rel_mask: True
+  # point_rel_enable: True
+  # temporal enc/dec configs
+  tempenc: 'rnn' # rnn | conv
+  # tempdec: 'rnn' # rnn | deconv
+  tempdec_hidden_size: 256
+  rnn_dropout_keep_prob: 0.75
+  mlp_dropout_keep_prob: 0.75
+  # convae configs
+  convae:
+    ckpt_dir: 'checkpoints/cae' 
+    out_dir: ''
+    test_epoch: 125
+    image_size: 80
+    latent_dim: 64
+    # vis_dec: True
+    loss: 'null' # 'bce' | 'mse' 
+    pretrain: True
+    load_pretrain_weights: True
+dataset:
+  name: 'zara1'
+  ethucy_config: 'configs/eth_ucy.json'
+  density_kernel_size: 'fixed'
+  density_kernel_sigma: 10
+  image_path: '/dataset/eth_ucy'
+  trajectory_path: '/dataset/ewap_crowds/processed/'
+  fps: 2.5
+  augment: False
+  normalize: 'zero-one' 
+  excl_unseen_node: True
+  frame_pred: True # frame-wise prediction
+  perturb_input: True
+dataloader:
+  num_workers: 4
+solver:
+  # train_module: 'fol'
+  max_epoch: 100
+  batch_size: 64 #128
+  optimizer: 'Adam' #'SGD'
+  lr: 0.001
+  scheduler: 'exp'
+  gamma: 0.9999
+test:
+  batch_size: 64 #128
+  inference: True
+  epoch: 98
+  metrics: ['ADE(1.2s)', 'FDE(1.2s)', 'ADE(2.4s)', 'FDE(2.4s)', 'ADE(3.6s)', 'FDE(3.6s)', 'ADE(4.8s)', 'FDE(4.8s)','ADE', 'FDE',] # for the ETH-UCY dataset
+stats_anl:
+  # subsets: ['test',] # ['train', 'val', 'test']
+  mode: '3d'
